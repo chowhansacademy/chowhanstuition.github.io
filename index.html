@@ -1,1 +1,737 @@
-<h1>Hello World</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chowhan's Tuitions | Unlock Your Academic Potential</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #1A365D;
+            --primary-light: #2A4365;
+            --accent: #FF6B6B;
+            --accent-hover: #EE5B5B;
+            --text-dark: #2D3748;
+            --text-light: #718096;
+            --bg-light: #F7FAFC;
+            --white: #FFFFFF;
+            --gold: #D4AF37;
+            --shadow: 0 10px 30px rgba(0,0,0,0.05);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            background-color: var(--white);
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Navigation */
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #f9fbfd 0%, #eef3f8 100%);
+            position: relative;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            line-height: 1.2;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .hero-content p {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 35px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 20px;
+        }
+
+        .hero-image-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Fancy SVG illustration/mockup container */
+        .hero-graphics {
+            width: 100%;
+            max-width: 450px;
+            height: 400px;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .badge-top-score {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            background: var(--white);
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .badge-top-score i {
+            color: var(--gold);
+            font-size: 1.5rem;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Trust Metrics Section */
+        .metrics {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 40px 0;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            text-align: center;
+        }
+
+        .metric-item h3 {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+
+        .metric-item p {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        /* Core Pillars Section */
+        .pillars {
+            padding: 100px 0;
+            background-color: var(--white);
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 60px auto;
+        }
+
+        .section-header h2 {
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .section-header p {
+            color: var(--text-light);
+        }
+
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        .pillar-card {
+            padding: 40px 30px;
+            background: var(--bg-light);
+            border-radius: 15px;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .pillar-card:hover {
+            transform: translateY(-5px);
+            background: var(--white);
+            border-color: rgba(26, 54, 93, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .pillar-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background-color: rgba(26, 54, 93, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 25px;
+        }
+
+        .pillar-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .pillar-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* Courses Section */
+        .courses {
+            padding: 100px 0;
+            background-color: var(--bg-light);
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .course-card {
+            background-color: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-badge {
+            background: var(--primary-light);
+            color: var(--white);
+            padding: 20px;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .course-body {
+            padding: 30px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .course-body p {
+            color: var(--text-light);
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+
+        /* Testimonials Section */
+        .testimonials {
+            padding: 100px 0;
+            background-color: var(--white);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .testimonial-card {
+            padding: 40px;
+            background-color: var(--bg-light);
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .testimonial-card i.quote-icon {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            font-size: 2.5rem;
+            color: rgba(26, 54, 93, 0.05);
+        }
+
+        .testimonial-card p {
+            font-style: italic;
+            color: var(--text-dark);
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .student-details h4 {
+            font-size: 1rem;
+            color: var(--primary);
+        }
+
+        .student-details span {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* CTA Lead Capture Section */
+        .cta-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--white);
+        }
+
+        .cta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .cta-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .cta-text p {
+            opacity: 0.85;
+            font-size: 1.1rem;
+        }
+
+        .form-container {
+            background-color: var(--white);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text-dark);
+            transition: var(--transition);
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+
+        .form-container .btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #0F172A;
+            color: rgba(255,255,255,0.7);
+            padding: 40px 0;
+            text-align: center;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero-grid, .courses-grid, .pillars-grid, .testimonials-grid, .cta-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .hero-content {
+                text-align: center;
+            }
+            .hero-cta {
+                justify-content: center;
+            }
+            .hero-image-container {
+                order: -1;
+            }
+            .cta-text {
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .nav-links {
+                display: none; /* Simplification for standalone code template */
+            }
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-content h1 {
+                font-size: 2.2rem;
+            }
+            .hero-cta {
+                flex-direction: column;
+            }
+            .form-container {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">
+                    <i class="fa-solid fa-graduation-cap"></i> Chowhan's<span>Tuitions</span>
+                </a>
+                <ul class="nav-links">
+                    <li><a href="#about">Why Us</a></li>
+                    <li><a href="#courses">Courses</a></li>
+                    <li><a href="#testimonials">Success Stories</a></li>
+                    <li><a href="#contact" class="btn btn-primary" style="color: white; padding: 8px 20px;">Enroll Now</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <h1>Unlock Your Academic Potential</h1>
+                    <p>Expert-led coaching designed to turn complex concepts into career-defining success. From core school curriculum building to competitive entrance preparation, we engineer academic foundations that last a lifetime.</p>
+                    <div class="hero-cta">
+                        <a href="#contact" class="btn btn-primary">Book a Free Demo Class</a>
+                        <a href="#courses" class="btn btn-secondary">Explore Courses</a>
+                    </div>
+                </div>
+                <div class="hero-image-container">
+                    <div class="hero-graphics">
+                        <i class="fa-solid fa-chart-line-up" style="font-size: 5rem; color: rgba(26, 54, 93, 0.15); margin-bottom: 20px;"></i>
+                        <div style="font-family: 'Poppins'; font-weight: 700; color: var(--primary); font-size: 1.2rem;">Conceptual Learning App</div>
+                        <div style="color: var(--text-light); font-size: 0.85rem; margin-top: 5px;">Interactive Module Activated</div>
+                        
+                        <div class="badge-top-score">
+                            <i class="fa-solid fa-award"></i>
+                            <div>
+                                <div style="font-weight: 700; font-size: 1rem; color: var(--text-dark);">Top Tier Results</div>
+                                <div style="font-size: 0.75rem; color: var(--text-light);">Centum Performance Track</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="metrics">
+        <div class="container">
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <h3>95%+</h3>
+                    <p>Success Rate</p>
+                </div>
+                <div class="metric-item">
+                    <h3>10+ Yrs</h3>
+                    <p>Academic Excellence</p>
+                </div>
+                <div class="metric-item">
+                    <h3>500+</h3>
+                    <p>Students Mentored</p>
+                </div>
+                <div class="metric-item">
+                    <h3>1-on-1</h3>
+                    <p>Doubt Solving</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="pillars" id="about">
+        <div class="container">
+            <div class="section-header">
+                <h2>Our Core Pillars</h2>
+                <p>We redefine modern learning by moving away from conventional rote learning paradigms.</p>
+            </div>
+            <div class="pillars-grid">
+                <div class="pillar-card">
+                    <div class="pillar-icon"><i class="fa-solid fa-brain"></i></div>
+                    <h3>Conceptual Clarity</h3>
+                    <p>We focus heavily on deeply understanding the core principles behind every formula, theorem, and statement.</p>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon"><i class="fa-solid fa-user-graduate"></i></div>
+                    <h3>Personalized Attention</h3>
+                    <p>With strictly structured, compact batch sizes, our instructors adapt effortlessly to individual student learning paces.</p>
+                </div>
+                <div class="pillar-card">
+                    <div class="pillar-icon"><i class="fa-solid fa-file-invoice"></i></div>
+                    <h3>Rigorous Assessment</h3>
+                    <p>Frequent chapter-wise evaluation modules, mock testing, and granular metric performance analytics track progression timeline.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="courses" id="courses">
+        <div class="container">
+            <div class="section-header">
+                <h2>Featured Programs</h2>
+                <p>Curated curriculums specialized to optimize execution and knowledge framework scaling.</p>
+            </div>
+            <div class="courses-grid">
+                <div class="course-card">
+                    <div class="course-badge">Class 8th - 10th</div>
+                    <div class="course-body">
+                        <p>Constructing fundamental robust clarity frameworks in Mathematics, Physics, and Chemistry for early secondary stages.</p>
+                        <a href="#contact" class="btn btn-secondary" style="text-align: center; width: 100%;">Learn More</a>
+                    </div>
+                </div>
+                <div class="course-card">
+                    <div class="course-badge">Class 11th - 12th</div>
+                    <div class="course-body">
+                        <p>Advanced higher secondary analytical conceptualization calibrated explicitly toward Board Exams and streamlined excellence.</p>
+                        <a href="#contact" class="btn btn-secondary" style="text-align: center; width: 100%;">Learn More</a>
+                    </div>
+                </div>
+                <div class="course-card">
+                    <div class="course-badge">Competitive Prep</div>
+                    <div class="course-body">
+                        <p>High-intensity focus frameworks, velocity training matrices, and deep mock testing optimizations targeting competitive environments.</p>
+                        <a href="#contact" class="btn btn-secondary" style="text-align: center; width: 100%;">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2>Success Stories</h2>
+                <p>Read real verification metrics provided directly by students and parents globally.</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <i class="fa-solid fa-quote-right quote-icon"></i>
+                    <p>"Enrolling into Chowhan's Tuitions proved to be the structural turning point for my daughter's physical science mechanics marks. They built conceptual confidence completely from ground zero."</p>
+                    <div class="student-info">
+                        <div class="avatar">AR</div>
+                        <div class="student-details">
+                            <h4>Anjali R.</h4>
+                            <span>Parent</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <i class="fa-solid fa-quote-right quote-icon"></i>
+                    <p>"The micro doubt-clearing sessions are incredibly precise. I never felt hesitant mapping conceptual blocks. The integrated rapid math shortcuts optimized massive exam execution time."</p>
+                    <div class="student-info">
+                        <div class="avatar">RK</div>
+                        <div class="student-details">
+                            <h4>Rahul K.</h4>
+                            <span>Class 12 Student</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section" id="contact">
+        <div class="container">
+            <div class="cta-grid">
+                <div class="cta-text">
+                    <h2>Ready to Experience the Academic Difference?</h2>
+                    <p>Take the definitive initiative step toward structural grade trajectory escalation. Secure registration for our highly anticipated upcoming educational cohort timeline immediately.</p>
+                </div>
+                <div class="form-container">
+                    <form onsubmit="event.preventDefault(); alert('Demo Seat Request Successfully Transmitted!');">
+                        <div class="form-group">
+                            <label for="name">Student Name</label>
+                            <input type="text" id="name" placeholder="Enter Full Name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Contact Number</label>
+                            <input type="tel" id="phone" placeholder="Enter Mobile Number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="grade">Target Cohort/Grade</label>
+                            <select id="grade" required>
+                                <option value="" disabled selected>Select Target Cohort</option>
+                                <option value="8-10">Class 8th - 10th Foundation</option>
+                                <option value="11-12">Class 11th - 12th Advanced</option>
+                                <option value="competitive">Competitive Exam Preparation</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Claim Free Demo Seat</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Chowhan's Tuitions. All Intellectual Pedagogical Frameworks Reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
