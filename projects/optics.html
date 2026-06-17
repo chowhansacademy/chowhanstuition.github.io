@@ -150,9 +150,7 @@
             
             let mouseX = getMouseX(e);
             
-            if (currentOptics.includes('mirror')) {
-                if (mouseX > originX - 10) mouseX = originX - 10;
-            }
+            if (mouseX > originX - 10) mouseX = originX - 10;
             
             if (mouseX < 20) mouseX = 20;
             if (mouseX > canvas.width - 20) mouseX = canvas.width - 20;
@@ -268,16 +266,23 @@
             // 2. Render Optical Element
             ctx.beginPath();
             if (currentOptics === 'concave-mirror') {
-                ctx.arc(originX - 200, originY, 200, -0.3, 0.3);
+                ctx.arc(originX - 400, originY, 400, -0.3, 0.3);
                 ctx.stroke();
-                drawMirrorHatching(originX - 200, originY, 200, -0.3, 0.3, true);
+                drawMirrorHatching(originX - 400, originY, 400, -0.3, 0.3, true);
             } else if (currentOptics === 'convex-mirror') {
-                ctx.arc(originX + 200, originY, 200, Math.PI - 0.3, Math.PI + 0.3);
+                ctx.arc(originX + 400, originY, 400, Math.PI - 0.3, Math.PI + 0.3);
                 ctx.stroke();
-                drawMirrorHatching(originX + 200, originY, 200, Math.PI - 0.3, Math.PI + 0.3, false);
+                drawMirrorHatching(originX + 400, originY, 400, Math.PI - 0.3, Math.PI + 0.3, false);
             } else if (currentOptics === 'convex-lens') {
-                ctx.ellipse(originX, originY, 15, 120, 0, 0, 2 * Math.PI);
+                ctx.save();
+                ctx.beginPath();
+                // Left arc (facing right)
+                ctx.arc(originX - 105, originY, 120, -0.55, 0.55);
+                // Right arc (facing left)
+                ctx.arc(originX + 105, originY, 120, Math.PI - 0.55, Math.PI + 0.55);
+                ctx.closePath();
                 ctx.stroke();
+                ctx.restore();
             } else if (currentOptics === 'concave-lens') {
                 ctx.moveTo(originX - 15, originY - 120);
                 ctx.lineTo(originX + 15, originY - 120);
