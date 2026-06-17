@@ -11,16 +11,15 @@
     
     <style>
         :root {
-            --primary: #1A365D;
-            --primary-light: #2A4365;
-            --accent: #FF6B6B;
-            --accent-hover: #EE5B5B;
-            --text-dark: #2D3748;
-            --text-light: #718096;
-            --bg-light: #F7FAFC;
-            --white: #FFFFFF;
-            --gold: #D4AF37;
-            --shadow: 0 10px 30px rgba(0,0,0,0.05);
+            --bg-main: #fffce7;       /* Customized Synergistic Cream Background */
+            --primary: #1E293B;       /* Deep Charcoal Navy */
+            --primary-light: #334155;
+            --accent: #D97706;        /* Warm Amber Gold */
+            --accent-hover: #B45309;
+            --text-dark: #0F172A;
+            --text-light: #475569;
+            --card-bg: #FFFFFF;
+            --shadow: 0 10px 30px rgba(217, 119, 6, 0.06);
             --transition: all 0.3s ease;
         }
 
@@ -34,7 +33,7 @@
             font-family: 'Inter', sans-serif;
             color: var(--text-dark);
             line-height: 1.6;
-            background-color: var(--white);
+            background-color: var(--bg-main);
             overflow-x: hidden;
         }
 
@@ -50,10 +49,10 @@
             padding: 0 20px;
         }
 
-        /* Navigation */
+        /* Header Navigation */
         header {
-            background-color: var(--white);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            background-color: var(--bg-main);
+            border-bottom: 1px solid rgba(217, 119, 6, 0.1);
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -63,26 +62,32 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
+            padding: 15px 0;
         }
 
         .logo {
-            font-size: 1.5rem;
-            color: var(--primary);
-            text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            text-decoration: none;
         }
 
-        .logo span {
-            color: var(--accent);
+        .logo img {
+            height: 90px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 30px;
         }
 
         .nav-links {
             display: flex;
             list-style: none;
-            gap: 30px;
+            gap: 25px;
             align-items: center;
         }
 
@@ -95,6 +100,67 @@
 
         .nav-links a:hover {
             color: var(--accent);
+        }
+
+        /* Interactive Projects Dropdown Controls */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            background-color: var(--card-bg);
+            min-width: 240px;
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+            padding: 10px 0;
+            border: 1px solid rgba(217, 119, 6, 0.1);
+            top: 100%;
+            left: 0;
+        }
+
+        .dropdown-menu a {
+            color: var(--text-dark);
+            padding: 10px 20px;
+            display: block;
+            font-size: 0.95rem;
+        }
+
+        .dropdown-menu a:hover {
+            background-color: var(--bg-main);
+            color: var(--accent);
+        }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        /* Language Toggle Switch styling */
+        .lang-switch {
+            display: flex;
+            background: rgba(217, 119, 6, 0.1);
+            padding: 4px;
+            border-radius: 30px;
+            border: 1px solid rgba(217, 119, 6, 0.15);
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            border-radius: 20px;
+            transition: var(--transition);
+        }
+
+        .lang-btn.active {
+            background: var(--accent);
+            color: white;
         }
 
         .btn {
@@ -111,8 +177,8 @@
 
         .btn-primary {
             background-color: var(--accent);
-            color: var(--white);
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            color: white;
+            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.2);
         }
 
         .btn-primary:hover {
@@ -120,23 +186,10 @@
             transform: translateY(-2px);
         }
 
-        .btn-secondary {
-            background-color: transparent;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--primary);
-            color: var(--white);
-            transform: translateY(-2px);
-        }
-
-        /* Hero Section */
+        /* Hero Layout */
         .hero {
             padding: 80px 0;
-            background: linear-gradient(135deg, #f9fbfd 0%, #eef3f8 100%);
-            position: relative;
+            background: linear-gradient(180deg, var(--bg-main) 0%, rgba(255,252,231,0.5) 100%);
         }
 
         .hero-grid {
@@ -159,289 +212,117 @@
             margin-bottom: 35px;
         }
 
-        .hero-cta {
-            display: flex;
-            gap: 20px;
-        }
-
         .hero-image-container {
             position: relative;
             display: flex;
             justify-content: center;
         }
 
-        /* Fancy SVG illustration/mockup container */
         .hero-graphics {
             width: 100%;
             max-width: 450px;
             height: 400px;
-            background: var(--white);
+            background: var(--card-bg);
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            border: 1px solid rgba(0,0,0,0.03);
-        }
-
-        .badge-top-score {
-            position: absolute;
-            top: -20px;
-            right: -20px;
-            background: var(--white);
-            padding: 15px 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            animation: float 4s ease-in-out infinite;
-        }
-
-        .badge-top-score i {
-            color: var(--gold);
-            font-size: 1.5rem;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-
-        /* Trust Metrics Section */
-        .metrics {
-            background-color: var(--primary);
-            color: var(--white);
-            padding: 40px 0;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 30px;
-            text-align: center;
-        }
-
-        .metric-item h3 {
-            font-size: 2.5rem;
-            color: var(--accent);
-            margin-bottom: 5px;
-        }
-
-        .metric-item p {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0.9;
-        }
-
-        /* Core Pillars Section */
-        .pillars {
-            padding: 100px 0;
-            background-color: var(--white);
-        }
-
-        .section-header {
-            text-align: center;
-            max-width: 600px;
-            margin: 0 auto 60px auto;
-        }
-
-        .section-header h2 {
-            font-size: 2.2rem;
-            color: var(--primary);
-            margin-bottom: 15px;
-        }
-
-        .section-header p {
-            color: var(--text-light);
-        }
-
-        .pillars-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
-        }
-
-        .pillar-card {
-            padding: 40px 30px;
-            background: var(--bg-light);
-            border-radius: 15px;
-            transition: var(--transition);
-            border: 1px solid transparent;
-        }
-
-        .pillar-card:hover {
-            transform: translateY(-5px);
-            background: var(--white);
-            border-color: rgba(26, 54, 93, 0.1);
-            box-shadow: var(--shadow);
-        }
-
-        .pillar-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            background-color: rgba(26, 54, 93, 0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-bottom: 25px;
-        }
-
-        .pillar-card h3 {
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-            color: var(--primary);
-        }
-
-        .pillar-card p {
-            color: var(--text-light);
-            font-size: 0.95rem;
-        }
-
-        /* Courses Section */
-        .courses {
-            padding: 100px 0;
-            background-color: var(--bg-light);
-        }
-
-        .courses-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-        }
-
-        .course-card {
-            background-color: var(--white);
-            border-radius: 15px;
-            overflow: hidden;
             box-shadow: var(--shadow);
             display: flex;
             flex-direction: column;
-        }
-
-        .course-badge {
-            background: var(--primary-light);
-            color: var(--white);
-            padding: 20px;
-            text-align: center;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-
-        .course-body {
-            padding: 30px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .course-body p {
-            color: var(--text-light);
-            margin-bottom: 25px;
-            font-size: 0.95rem;
-        }
-
-        /* Testimonials Section */
-        .testimonials {
-            padding: 100px 0;
-            background-color: var(--white);
-        }
-
-        .testimonials-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-        }
-
-        .testimonial-card {
-            padding: 40px;
-            background-color: var(--bg-light);
-            border-radius: 15px;
-            position: relative;
-        }
-
-        .testimonial-card i.quote-icon {
-            position: absolute;
-            top: 30px;
-            right: 40px;
-            font-size: 2.5rem;
-            color: rgba(26, 54, 93, 0.05);
-        }
-
-        .testimonial-card p {
-            font-style: italic;
-            color: var(--text-dark);
-            margin-bottom: 25px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .student-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: var(--primary-light);
-            color: var(--white);
-            display: flex;
-            align-items: center;
             justify-content: center;
-            font-weight: 600;
+            align-items: center;
+            border: 1px solid rgba(217, 119, 6, 0.1);
         }
 
-        .student-details h4 {
-            font-size: 1rem;
-            color: var(--primary);
-        }
-
-        .student-details span {
+        .coming-soon-badge {
+            background: #FEF3C7;
+            color: #92400E;
+            padding: 6px 16px;
+            border-radius: 50px;
             font-size: 0.85rem;
-            color: var(--text-light);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 15px;
         }
 
-        /* CTA Lead Capture Section */
-        .cta-section {
-            padding: 100px 0;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: var(--white);
+        /* Business Data Cards Section */
+        .info-section {
+            padding: 80px 0;
+            background-color: var(--bg-main);
         }
 
-        .cta-grid {
+        .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
+            gap: 50px;
         }
 
-        .cta-text h2 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
+        .info-card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(217, 119, 6, 0.05);
         }
 
-        .cta-text p {
-            opacity: 0.85;
-            font-size: 1.1rem;
+        .info-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .info-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #F1F5F9;
+            font-size: 0.95rem;
+        }
+
+        .info-list li.address-li {
+            flex-direction: column;
+            gap: 5px;
+            border-bottom: none;
+        }
+
+        .map-embed {
+            width: 100%;
+            height: 330px;
+            border-radius: 15px;
+            border: none;
+            margin-top: 15px;
+            background: #e5e7eb;
+        }
+
+        /* Reviews Panel */
+        .reviews-section {
+            padding: 80px 0;
+            background-color: var(--card-bg);
+        }
+
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .review-card {
+            background: var(--bg-main);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(217, 119, 6, 0.1);
+        }
+
+        .stars {
+            color: #F59E0B;
+            margin-bottom: 15px;
         }
 
         .form-container {
-            background-color: var(--white);
+            background-color: var(--card-bg);
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(217, 119, 6, 0.1);
         }
 
         .form-group {
@@ -453,82 +334,26 @@
             margin-bottom: 8px;
             color: var(--text-dark);
             font-weight: 500;
-            font-size: 0.9rem;
         }
 
-        .form-group input, .form-group select {
+        .form-group input {
             width: 100%;
             padding: 14px;
-            border: 1px solid #E2E8F0;
             border-radius: 8px;
-            font-family: inherit;
-            font-size: 1rem;
-            color: var(--text-dark);
-            transition: var(--transition);
+            border: 1px solid rgba(217, 119, 6, 0.15);
+            background-color: var(--bg-main);
         }
 
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
-        }
-
-        .form-container .btn {
-            width: 100%;
-            padding: 14px;
-            font-size: 1rem;
-            margin-top: 10px;
-        }
-
-        /* Footer */
         footer {
-            background-color: #0F172A;
-            color: rgba(255,255,255,0.7);
+            background-color: var(--primary);
+            color: #94A3B8;
             padding: 40px 0;
             text-align: center;
-            font-size: 0.9rem;
-            border-top: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* Responsive Design */
         @media (max-width: 992px) {
-            .hero-grid, .courses-grid, .pillars-grid, .testimonials-grid, .cta-grid {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-            .metrics-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .hero-content {
-                text-align: center;
-            }
-            .hero-cta {
-                justify-content: center;
-            }
-            .hero-image-container {
-                order: -1;
-            }
-            .cta-text {
-                text-align: center;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .nav-links {
-                display: none; /* Simplification for standalone code template */
-            }
-            .metrics-grid {
-                grid-template-columns: 1fr;
-            }
-            .hero-content h1 {
-                font-size: 2.2rem;
-            }
-            .hero-cta {
-                flex-direction: column;
-            }
-            .form-container {
-                padding: 25px;
-            }
+            .hero-grid, .info-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
         }
     </style>
 </head>
@@ -538,14 +363,26 @@
         <div class="container">
             <nav>
                 <a href="#" class="logo">
-                    <i class="fa-solid fa-graduation-cap"></i> Chowhan's<span>Tuitions</span>
+                    <img src="logo.png" alt="Chowhan's Tuitions Logo" onerror="this.style.display='none'; document.getElementById('logo-text').style.display='block';">
+                    <span id="logo-text" style="display:none; font-family:'Poppins'; font-weight:700; color:var(--primary); font-size:1.4rem;">Chowhan's <span style="color:var(--accent);">Tuitions</span></span>
                 </a>
-                <ul class="nav-links">
-                    <li><a href="#about">Why Us</a></li>
-                    <li><a href="#courses">Courses</a></li>
-                    <li><a href="#testimonials">Success Stories</a></li>
-                    <li><a href="#contact" class="btn btn-primary" style="color: white; padding: 8px 20px;">Enroll Now</a></li>
-                </ul>
+                <div class="nav-right">
+                    <ul class="nav-links">
+                        <li class="dropdown">
+                            <a href="javascript:void(0)" data-key="nav-projects">Projects <i class="fa-solid fa-chevron-down" style="font-size:0.75rem; margin-left:3px;"></i></a>
+                            <div class="dropdown-menu">
+                                <a href="projects/optics.html" data-key="nav-optics">Optics Simulator</a>
+                            </div>
+                        </li>
+                        <li><a href="#location" data-key="nav-hours">Timings & Location</a></li>
+                        <li><a href="#reviews" data-key="nav-reviews">Reviews</a></li>
+                    </ul>
+                    
+                    <div class="lang-switch">
+                        <button class="lang-btn active" onclick="setLanguage('en')" id="btn-en">EN</button>
+                        <button class="lang-btn" onclick="setLanguage('te')" id="btn-te">తెలుగు</button>
+                    </div>
+                </div>
             </nav>
         </div>
     </header>
@@ -554,173 +391,91 @@
         <div class="container">
             <div class="hero-grid">
                 <div class="hero-content">
-                    <h1>Unlock Your Academic Potential</h1>
-                    <p>Expert-led coaching designed to turn complex concepts into career-defining success. From core school curriculum building to competitive entrance preparation, we engineer academic foundations that last a lifetime.</p>
-                    <div class="hero-cta">
-                        <a href="#contact" class="btn btn-primary">Book a Free Demo Class</a>
-                        <a href="#courses" class="btn btn-secondary">Explore Courses</a>
+                    <h1 data-key="hero-title">Unlock Your Academic Potential</h1>
+                    <p data-key="hero-desc">Expert-led coaching designed to turn complex concepts into career-defining success. From core secondary school curriculum building to competitive entrance preparation.</p>
+                    <div>
+                        <a href="#contact" class="btn btn-primary" data-key="hero-btn-primary">Book a Free Demo Class</a>
                     </div>
                 </div>
                 <div class="hero-image-container">
                     <div class="hero-graphics">
-                        <i class="fa-solid fa-chart-line-up" style="font-size: 5rem; color: rgba(26, 54, 93, 0.15); margin-bottom: 20px;"></i>
-                        <div style="font-family: 'Poppins'; font-weight: 700; color: var(--primary); font-size: 1.2rem;">Conceptual Learning App</div>
-                        <div style="color: var(--text-light); font-size: 0.85rem; margin-top: 5px;">Interactive Module Activated</div>
-                        
-                        <div class="badge-top-score">
-                            <i class="fa-solid fa-award"></i>
-                            <div>
-                                <div style="font-weight: 700; font-size: 1rem; color: var(--text-dark);">Top Tier Results</div>
-                                <div style="font-size: 0.75rem; color: var(--text-light);">Centum Performance Track</div>
-                            </div>
-                        </div>
+                        <i class="fa-solid fa-laptop-code" style="font-size: 5rem; color: rgba(219, 123, 6, 0.2); margin-bottom: 10px;"></i>
+                        <div style="font-family: 'Poppins'; font-weight: 700; color: var(--primary); font-size: 1.2rem;" data-key="app-title">Resource Learning App</div>
+                        <span class="coming-soon-badge" data-key="coming-soon">Coming Soon</span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="metrics">
+    <section class="info-section" id="location">
         <div class="container">
-            <div class="metrics-grid">
-                <div class="metric-item">
-                    <h3>95%+</h3>
-                    <p>Success Rate</p>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3 style="color: var(--primary); font-size: 1.4rem; margin-bottom: 5px;"><i class="fa-solid fa-clock" style="color: var(--accent);"></i> <span data-key="hours-title">Business Hours</span></h3>
+                    <ul class="info-list">
+                        <li><span data-key="days-all">Daily Operational Hours</span><strong id="live-hours">5:30 PM – 9:00 PM</strong></li>
+                    </ul>
+
+                    <h3 style="color: var(--primary); font-size: 1.4rem; margin-top: 35px; margin-bottom: 5px;"><i class="fa-solid fa-address-book" style="color: var(--accent);"></i> <span data-key="contact-title">Contact</span></h3>
+                    <ul class="info-list" style="border-top: none;">
+                        <li><span data-key="contact-phone">Phone Line</span><strong id="live-phone">+91 72075 12751</strong></li>
+                        <li><span>Support Email</span><strong>chowhansacademy@gmail.com</strong></li>
+                    </ul>
                 </div>
-                <div class="metric-item">
-                    <h3>10+ Yrs</h3>
-                    <p>Academic Excellence</p>
-                </div>
-                <div class="metric-item">
-                    <h3>500+</h3>
-                    <p>Students Mentored</p>
-                </div>
-                <div class="metric-item">
-                    <h3>1-on-1</h3>
-                    <p>Doubt Solving</p>
+                
+                <div class="info-card">
+                    <h3 style="color: var(--primary); font-size: 1.4rem; margin-bottom: 5px;"><i class="fa-solid fa-map-location-dot" style="color: var(--accent);"></i> <span data-key="map-heading">Location</span></h3>
+                    <ul class="info-list" style="margin-top: 10px;">
+                        <li class="address-li">
+                            <span style="font-weight: 600; color: var(--text-dark);" data-key="lbl-address">Address Location:</span>
+                            <span style="color: var(--text-light); font-size: 0.9rem;" id="live-address">Chowhan's tuition, 3/12/28, plot 87, Road No. 3, srinivasa nagar, Mansoorabad, Hyderabad, Telangana 500068, India</span>
+                        </li>
+                    </ul>
+                    <iframe class="map-embed" src="https://maps.google.com/maps?q=Chowhan's%20tuition,%20Mansoorabad&t=&z=15&ie=UTF8&iwloc=&output=embed" allowfullscreen></iframe>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="pillars" id="about">
+    <section class="reviews-section" id="reviews">
         <div class="container">
-            <div class="section-header">
-                <h2>Our Core Pillars</h2>
-                <p>We redefine modern learning by moving away from conventional rote learning paradigms.</p>
-            </div>
-            <div class="pillars-grid">
-                <div class="pillar-card">
-                    <div class="pillar-icon"><i class="fa-solid fa-brain"></i></div>
-                    <h3>Conceptual Clarity</h3>
-                    <p>We focus heavily on deeply understanding the core principles behind every formula, theorem, and statement.</p>
+            <h2 style="text-align: center; margin-bottom: 5px; font-size: 2.2rem; color: var(--primary);" data-key="reviews-heading">Our Sucess Stories</h2>
+            <p style="text-align: center; color: var(--text-light);" data-key="reviews-subheading">Real execution metrics sourced from our community.</p>
+            
+            <div class="reviews-grid" id="reviews-injection-container">
+                <div class="review-card">
+                    <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    <p style="font-style: italic; margin-bottom: 15px;" data-key="rev1-text">"The teaching is clear and easy to follow. Regular tests and personal attention really help me improve"</p>
+                    <strong style="color: var(--primary); font-size: 0.95rem;">- <span data-key="rev1-author">Sri Lakavath</span> (<span data-key="tag-student">Student</span>)</strong>
                 </div>
-                <div class="pillar-card">
-                    <div class="pillar-icon"><i class="fa-solid fa-user-graduate"></i></div>
-                    <h3>Personalized Attention</h3>
-                    <p>With strictly structured, compact batch sizes, our instructors adapt effortlessly to individual student learning paces.</p>
-                </div>
-                <div class="pillar-card">
-                    <div class="pillar-icon"><i class="fa-solid fa-file-invoice"></i></div>
-                    <h3>Rigorous Assessment</h3>
-                    <p>Frequent chapter-wise evaluation modules, mock testing, and granular metric performance analytics track progression timeline.</p>
+                <div class="review-card">
+                    <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    <p style="font-style: italic; margin-bottom: 15px;" data-key="rev2-text">"Chowhan’s tution Good in teaching, thank you for improving our kids knowledge"</p>
+                    <strong style="color: var(--primary); font-size: 0.95rem;">- <span data-key="rev2-author">Thirunagari Vamshi</span> (<span data-key="tag-parent">Parent</span>)</strong>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="courses" id="courses">
+    <section class="cta-section" id="contact" style="background: var(--primary); color: white; padding: 100px 0;">
         <div class="container">
-            <div class="section-header">
-                <h2>Featured Programs</h2>
-                <p>Curated curriculums specialized to optimize execution and knowledge framework scaling.</p>
-            </div>
-            <div class="courses-grid">
-                <div class="course-card">
-                    <div class="course-badge">Class 8th - 10th</div>
-                    <div class="course-body">
-                        <p>Constructing fundamental robust clarity frameworks in Mathematics, Physics, and Chemistry for early secondary stages.</p>
-                        <a href="#contact" class="btn btn-secondary" style="text-align: center; width: 100%;">Learn More</a>
-                    </div>
-                </div>
-                <div class="course-card">
-                    <div class="course-badge">Class 11th - 12th</div>
-                    <div class="course-body">
-                        <p>Advanced higher secondary analytical conceptualization calibrated explicitly toward Board Exams and streamlined excellence.</p>
-                        <a href="#contact" class="btn btn-secondary" style="text-align: center; width: 100%;">Learn More</a>
-                    </div>
-                </div>
-                <div class="course-card">
-                    <div class="course-badge">Competitive Prep</div>
-                    <div class="course-body">
-                        <p>High-intensity focus frameworks, velocity training matrices, and deep mock testing optimizations targeting competitive environments.</p>
-                        <a href="#contact" class="btn btn-secondary" style="text-align: center; width: 100%;">Learn More</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="testimonials" id="testimonials">
-        <div class="container">
-            <div class="section-header">
-                <h2>Success Stories</h2>
-                <p>Read real verification metrics provided directly by students and parents globally.</p>
-            </div>
-            <div class="testimonials-grid">
-                <div class="testimonial-card">
-                    <i class="fa-solid fa-quote-right quote-icon"></i>
-                    <p>"Enrolling into Chowhan's Tuitions proved to be the structural turning point for my daughter's physical science mechanics marks. They built conceptual confidence completely from ground zero."</p>
-                    <div class="student-info">
-                        <div class="avatar">AR</div>
-                        <div class="student-details">
-                            <h4>Anjali R.</h4>
-                            <span>Parent</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card">
-                    <i class="fa-solid fa-quote-right quote-icon"></i>
-                    <p>"The micro doubt-clearing sessions are incredibly precise. I never felt hesitant mapping conceptual blocks. The integrated rapid math shortcuts optimized massive exam execution time."</p>
-                    <div class="student-info">
-                        <div class="avatar">RK</div>
-                        <div class="student-details">
-                            <h4>Rahul K.</h4>
-                            <span>Class 12 Student</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="cta-section" id="contact">
-        <div class="container">
-            <div class="cta-grid">
-                <div class="cta-text">
-                    <h2>Ready to Experience the Academic Difference?</h2>
-                    <p>Take the definitive initiative step toward structural grade trajectory escalation. Secure registration for our highly anticipated upcoming educational cohort timeline immediately.</p>
+            <div class="info-grid">
+                <div>
+                    <h2 style="font-size: 2.5rem; margin-bottom: 20px; color: white;" data-key="cta-heading">Ready to Claim Your Seat?</h2>
+                    <p style="opacity: 0.85; font-size: 1.1rem;" data-key="cta-subheading">Take the definitive initiative step toward structural grade trajectory escalation today.</p>
                 </div>
                 <div class="form-container">
-                    <form onsubmit="event.preventDefault(); alert('Demo Seat Request Successfully Transmitted!');">
+                    <form onsubmit="event.preventDefault(); alert('Request Transmitted!');">
                         <div class="form-group">
-                            <label for="name">Student Name</label>
-                            <input type="text" id="name" placeholder="Enter Full Name" required>
+                            <label data-key="lbl-name">Student Name</label>
+                            <input type="text" placeholder="Enter Full Name" required>
                         </div>
                         <div class="form-group">
-                            <label for="phone">Contact Number</label>
-                            <input type="tel" id="phone" placeholder="Enter Mobile Number" required>
+                            <label data-key="lbl-phone">Contact Number</label>
+                            <input type="tel" placeholder="Enter Mobile Number" required>
                         </div>
-                        <div class="form-group">
-                            <label for="grade">Target Cohort/Grade</label>
-                            <select id="grade" required>
-                                <option value="" disabled selected>Select Target Cohort</option>
-                                <option value="8-10">Class 8th - 10th Foundation</option>
-                                <option value="11-12">Class 11th - 12th Advanced</option>
-                                <option value="competitive">Competitive Exam Preparation</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Claim Free Demo Seat</button>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;" data-key="btn-submit">Claim Free Demo Seat</button>
                     </form>
                 </div>
             </div>
@@ -729,9 +484,145 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2026 Chowhan's Tuitions. All Intellectual Pedagogical Frameworks Reserved.</p>
+            <p>© 2026 Chowhan's Tuitions. All Intellectual Pedagogical Frameworks Reserved.</p>
         </div>
     </footer>
 
+    <script>
+        // Language Dictionary Mapping Data Object
+        const langData = {
+            en: {
+                "nav-projects": "Projects",
+                "nav-optics": "Optics Simulator",
+                "nav-hours": "Timings & Location",
+                "nav-reviews": "Reviews",
+                "hero-title": "Unlock Your Academic Potential",
+                "hero-desc": "Expert-led coaching designed to turn complex concepts into career-defining success. From core secondary school curriculum building to competitive entrance preparation.",
+                "hero-btn-primary": "Book a Free Demo Class",
+                "app-title": "Resource Learning App",
+                "coming-soon": "Coming Soon",
+                "hours-title": "Business Hours",
+                "days-all": "Daily Operational Hours",
+                "contact-title": "Contact",
+                "contact-phone": "Phone Line",
+                "map-heading": "Location",
+                "lbl-address": "Address:",
+                "reviews-heading": "Our Success Stories",
+                "reviews-subheading": "Real execution metrics sourced from community inputs.",
+                "tag-parent": "Parent",
+                "tag-student": "Student",
+                "rev1-text": "\"The teaching is clear and easy to follow. Regular tests and personal attention really help me improve\"",
+                "rev2-text": "\"Chowhan’s tution Good in teaching, thank you for improving our kids knowledge\"",
+                "cta-heading": "Ready to Claim Your Seat?",
+                "cta-subheading": "Take the definitive initiative step toward structural grade trajectory escalation today.",
+                "lbl-name": "Student Name",
+                "lbl-phone": "Contact Number",
+                "btn-submit": "Claim Free Demo Seat"
+            },
+            te: {
+                "nav-projects": "ప్రాజెక్ట్స్",
+                "nav-optics": "ఆప్టిక్స్ సిమ్యులేటర్",
+                "nav-hours": "వేళలు & స్థానం",
+                "nav-reviews": "సమీక్షలు",
+                "hero-title": "మీ విద్యా నైపుణ్యాలను పెంపొందించుకోండి",
+                "hero-desc": "క్లిష్టమైన అంశాలను సులభంగా అర్థం చేసుకునేలా మరియు మీ కెరీర్ విజయవంతం అయ్యేలా అనుభవజ్ఞులైన ఉపాధ్యాయులచే శిక్షణ ఇవ్వబడుతుంది.",
+                "hero-btn-primary": "ఉచిత డెమో క్లాస్ బుక్ చేయండి",
+                "app-title": "రిసోర్స్ లెర్నింగ్ యాప్",
+                "coming-soon": "త్వరలో వస్తుంది",
+                "hours-title": "పని వేళలు",
+                "days-all": "రోజువారీ పని వేళలు",
+                "contact-title": "నేరుగా సంప్రదించండి",
+                "contact-phone": "ఫోన్ నంబర్",
+                "map-heading": "గూగుల్ మ్యాప్స్ స్థానం",
+                "lbl-address": "చిరునామా:",
+                "reviews-heading": "మా విజయగాథలు",
+                "reviews-subheading": "మా విద్యార్థులు మరియు తల్లిదండ్రుల నుండి సేకరించిన నిజమైన అభిప్రాయాలు.",
+                "tag-parent": "తండ్రి",
+                "tag-student": "విద్యార్థి",
+                "rev1-author": "శ్రీ లకావత్",
+                "rev2-author": "తిరునగరి వంశీ",
+                "rev1-text": "\"బోధన చాలా స్పష్టంగా మరియు సులభంగా అర్థం చేసుకునేలా ఉంది. క్రమం తప్పకుండా నిర్వహించే పరీక్షలు మరియు వ్యక్తిగత శ్రద్ధ నేను మెరుగుపడటానికి నిజంగా సహాయపడతాయి\"",
+                "rev2-text": "\"చౌహాన్ ట్యూషన్ బోధనలో చాలా బాగుంది, మా పిల్లల జ్ఞానాన్ని మెరుగుపరిచినందుకు ధన్యవాదాలు\"",
+                "cta-heading": "మీ సీటును రిజర్వ్ చేసుకోవడానికి సిద్ధంగా ఉన్నారా?",
+                "cta-subheading": "ఈరోజే మీ విద్యా ప్రయాణంలో ఒక ఖచ్చితమైన ముందడుగు వేయండి.",
+                "lbl-name": "విద్యార్థి పేరు",
+                "lbl-phone": "సంప్రదించవలసిన నంబర్",
+                "btn-submit": "ఉచిత డెమో సీటును పొందండి"
+            }
+        };
+
+        function setLanguage(lang) {
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.getElementById('btn-te').classList.toggle('active', lang === 'te');
+            
+            document.querySelectorAll('[data-key]').forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (langData[lang][key]) {
+                    element.textContent = langData[lang][key];
+                }
+            });
+        }
+
+        // =========================================================================
+        // GOOGLE PLACES API DYNAMIC SYNC INTEGRATION
+        // =========================================================================
+        // To pull dynamic metadata automatically from your listing, replace the two variables below:
+        
+        const GOOGLE_PLACES_API_KEY = "YOUR_PLACES_API_KEY"; // <-- ENTER KEY HERE
+        const GOOGLE_PLACE_ID = "YOUR_ChIJoSGQVACZyzsR2b0D529kcGw";             // <-- ENTER PLACE ID HERE
+
+        async function fetchLiveGoogleMapsData() {
+            // Guard clause to exit if variables are still default placeholders
+            if (GOOGLE_PLACES_API_KEY.startsWith("YOUR_") || GOOGLE_PLACE_ID.startsWith("YOUR_")) {
+                console.log("Using local hardcoded fallback maps values.");
+                return;
+            }
+
+            const proxyUrl = "https://cors-anywhere.herokuapp.com/"; // Using development proxy bypass for CORS restrictions
+            const targetUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${GOOGLE_PLACE_ID}&fields=formatted_address,formatted_phone_number,opening_hours,reviews&key=${GOOGLE_PLACES_API_KEY}`;
+            
+            try {
+                const response = await fetch(proxyUrl + targetUrl);
+                const data = await response.json();
+                
+                if (data.status === "OK" && data.result) {
+                    const res = data.result;
+                    
+                    // Injecting live contact numbers & details if retrieved successfully
+                    if (res.formatted_phone_number) {
+                        document.getElementById('live-phone').textContent = res.formatted_phone_number;
+                    }
+                    if (res.formatted_address) {
+                        document.getElementById('live-address').textContent = res.formatted_address;
+                    }
+                    if (res.opening_hours && res.opening_hours.weekday_text) {
+                        // Takes today's operational data row from the listing schedule array
+                        const currentDayIndex = (new Date().getDay() + 6) % 7; // Aligning JS day indices to standard Monday rows
+                        document.getElementById('live-hours').textContent = res.opening_hours.weekday_text[currentDayIndex];
+                    }
+
+                    // Re-rendering live community reviews feed if available
+                    if (res.reviews && res.reviews.length > 0) {
+                        const reviewsContainer = document.getElementById('reviews-injection-container');
+                        reviewsContainer.innerHTML = ''; // Wipe preloaded fallbacks
+                        
+                        res.reviews.slice(0, 3).forEach(review => {
+                            reviewsContainer.innerHTML += `
+                                <div class="review-card">
+                                    <div class="stars">★ ★ ★ ★ ★</div>
+                                    <p style="font-style: italic; margin-bottom: 15px;">"${review.text}"</p>
+                                    <strong style="color: var(--primary); font-size: 0.95rem;">- ${review.author_name}</strong>
+                                </div>
+                            `;
+                        });
+                    }
+                }
+            } catch (err) {
+                console.warn("Failed retrieving dynamic API data. Preserving fallback configuration.", err);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', fetchLiveGoogleMapsData);
+    </script>
 </body>
 </html>
