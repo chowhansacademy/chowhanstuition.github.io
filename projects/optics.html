@@ -274,15 +274,9 @@
                 ctx.stroke();
                 drawMirrorHatching(originX + 400, originY, 400, Math.PI - 0.3, Math.PI + 0.3, false);
             } else if (currentOptics === 'convex-lens') {
-                ctx.save();
-                ctx.beginPath();
-                // Left arc (facing right)
-                ctx.arc(originX - 105, originY, 120, -0.55, 0.55);
-                // Right arc (facing left)
-                ctx.arc(originX + 105, originY, 120, Math.PI - 0.55, Math.PI + 0.55);
-                ctx.closePath();
+                ctx.arc(originX - 382, originY, 400, -0.3, 0.3);
+                ctx.arc(originX + 382, originY, 400, Math.PI - 0.3, Math.PI + 0.3);
                 ctx.stroke();
-                ctx.restore();
             } else if (currentOptics === 'concave-lens') {
                 ctx.moveTo(originX - 15, originY - 120);
                 ctx.lineTo(originX + 15, originY - 120);
