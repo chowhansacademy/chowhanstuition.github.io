@@ -20,12 +20,15 @@
             margin-bottom: 20px;
             display: flex;
             gap: 15px;
+            flex-wrap: wrap; /* Added for better mobile layout */
+            justify-content: center;
         }
 
         label {
             font-size: 16px;
             cursor: pointer;
             user-select: none;
+            padding: 5px; /* Easier to tap on mobile */
         }
 
         input[type="radio"] {
@@ -35,6 +38,9 @@
         canvas {
             border: 1px solid #000000;
             cursor: grab;
+            touch-action: none; /* Prevents mobile scrolling while dragging */
+            max-width: 100%;    /* Ensures canvas scales down on smaller screens */
+            height: auto;
         }
         
         canvas:active {
@@ -45,6 +51,7 @@
             margin-top: 10px;
             font-size: 14px;
             color: #666666;
+            text-align: center;
         }
 
         #status-card {
@@ -52,9 +59,13 @@
             padding: 15px;
             border: 1px solid #000000;
             width: 870px;
+            max-width: 100%; /* Adapts to smaller mobile screens */
+            box-sizing: border-box;
             display: flex;
             justify-content: space-between;
             font-size: 15px;
+            flex-wrap: wrap; /* Wraps items if screen is too narrow */
+            gap: 15px;
         }
 
         .status-group {
@@ -82,7 +93,7 @@
 
     <canvas id="opticsCanvas" width="900" height="450"></canvas>
     
-    <div class="instructions">Click and drag the vertical <b>Object</b> arrow along the axis.</div>
+    <div class="instructions">Click/Tap and drag the vertical <b>Object</b> arrow along the axis.</div>
 
     <div id="status-card">
         <div class="status-group">
@@ -129,26 +140,32 @@
             });
         });
 
-        function getMouseX(e) {
+        // Updated to use clientX safely relative to canvas bounding rect bounding box 
+        function getPointerX(e) {
             const rect = canvas.getBoundingClientRect();
-            return e.clientX - rect.left;
+            // Account for css scaling if the canvas is squeezed onto a small screen
+            const scaleX = canvas.width / rect.width;
+            return (e.clientX - rect.left) * scaleX;
         }
 
-        canvas.addEventListener('mousedown', (e) => {
-            const mouseX = getMouseX(e);
-            if (Math.abs(mouseX - objectX) < 25) {
+        // Switched to Pointer Events for universal desktop/mobile support
+        canvas.addEventListener('pointerdown', (e) => {
+            const pointerX = getPointerX(e);
+            // Increased tap target threshold slightly to 35 for fat-finger mobile friendliness
+            if (Math.abs(pointerX - objectX) < 35) {
                 isDragging = true;
+                canvas.setPointerCapture(e.pointerId); // Keeps tracking smooth even if finger slips off canvas
             }
         });
 
-        window.addEventListener('mouseup', () => {
+        window.addEventListener('pointerup', () => {
             isDragging = false;
         });
 
-        canvas.addEventListener('mousemove', (e) => {
+        canvas.addEventListener('pointermove', (e) => {
             if (!isDragging) return;
             
-            let mouseX = getMouseX(e);
+            let mouseX = getPointerX(e);
             
             if (mouseX > originX - 10) mouseX = originX - 10;
             
@@ -159,7 +176,6 @@
                 mouseX = mouseX < originX ? originX - 5 : originX + 5;
             }
 
-            // Avoid dividing by exactly focal length to prevent infinite projection values
             if (currentOptics === 'concave-mirror' && Math.abs((originX - mouseX) - fLength) < 3) {
                 mouseX = (originX - mouseX) < fLength ? originX - fLength + 3 : originX - fLength - 3;
             }
@@ -305,13 +321,12 @@
                 imgH = m * objH;
                 const imgX = originX + v;
 
-                // Incident parallel ray
                 ctx.beginPath();
                 ctx.moveTo(objX, originY - objH);
                 ctx.lineTo(originX, originY - objH);
                 ctx.stroke();
 
-                if (v < 0) { // Real image side
+                if (v < 0) { 
                     ctx.beginPath();
                     ctx.moveTo(originX, originY - objH);
                     ctx.lineTo(imgX, originY - imgH);
@@ -322,7 +337,7 @@
                     ctx.lineTo(originX, originY);
                     ctx.lineTo(imgX, originY - imgH);
                     ctx.stroke();
-                } else { // Virtual image side
+                } else { 
                     let slope1 = ((originY - imgH) - (originY - objH)) / (imgX - originX);
                     ctx.beginPath();
                     ctx.moveTo(originX, originY - objH);
@@ -352,7 +367,6 @@
                 ctx.lineTo(originX, originY - objH);
                 ctx.stroke();
 
-                // Dynamically changing reflected ray pointing away from virtual focus
                 let slope1 = ((originY - objH) - originY) / (originX - fRightX);
                 ctx.beginPath();
                 ctx.moveTo(originX, originY - objH);
@@ -360,7 +374,6 @@
                 ctx.stroke();
                 drawDashedLine(originX, originY - objH, imgX, originY - imgH);
 
-                // Dynamically changing pole bounce ray path
                 let slope2 = ((originY - imgH) - originY) / (imgX - originX);
                 ctx.beginPath();
                 ctx.moveTo(objX, originY - objH);
@@ -383,7 +396,7 @@
                 ctx.lineTo(originX, originY - objH);
                 ctx.stroke();
 
-                if (v > 0) { // Real focus space
+                if (v > 0) { 
                     ctx.beginPath();
                     ctx.moveTo(originX, originY - objH);
                     ctx.lineTo(imgX, originY - imgH);
@@ -393,7 +406,7 @@
                     ctx.moveTo(objX, originY - objH);
                     ctx.lineTo(imgX, originY - imgH);
                     ctx.stroke();
-                } else { // Virtual focus setup (Object between F & P)
+                } else { 
                     let slope1 = ((originY - imgH) - (originY - objH)) / (imgX - originX);
                     ctx.beginPath();
                     ctx.moveTo(originX, originY - objH);
@@ -423,7 +436,6 @@
                 ctx.lineTo(originX, originY - objH);
                 ctx.stroke();
 
-                // Dynamic refracted ray trajectory diverging away relative to image height point
                 let slope1 = ((originY - imgH) - (originY - objH)) / (imgX - originX);
                 ctx.beginPath();
                 ctx.moveTo(originX, originY - objH);
@@ -431,7 +443,6 @@
                 ctx.stroke();
                 drawDashedLine(originX, originY - objH, imgX, originY - imgH);
 
-                // Central optical ray line
                 let slope2 = ((originY - imgH) - originY) / (imgX - originX);
                 ctx.beginPath();
                 ctx.moveTo(objX, originY - objH);
