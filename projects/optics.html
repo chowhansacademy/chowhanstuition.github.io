@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Ray Diagram Simulator</title>
+    <title>Optics Simulator</title>
     <style>
         body {
             margin: 0;
@@ -20,27 +20,44 @@
             margin-bottom: 20px;
             display: flex;
             gap: 15px;
-            flex-wrap: wrap; /* Added for better mobile layout */
+            flex-wrap: wrap;
             justify-content: center;
         }
 
         label {
-            font-size: 16px;
+            font-size: 15px;
             cursor: pointer;
             user-select: none;
-            padding: 5px; /* Easier to tap on mobile */
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #fafafa;
+            transition: all 0.2s;
+        }
+
+        label:has(input:checked) {
+            background: #000000;
+            color: #ffffff;
+            border-color: #000000;
         }
 
         input[type="radio"] {
-            margin-right: 5px;
+            display: none;
+        }
+
+        #workspace {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 100%;
         }
 
         canvas {
             border: 1px solid #000000;
             cursor: grab;
-            touch-action: none; /* Prevents mobile scrolling while dragging */
-            max-width: 100%;    /* Ensures canvas scales down on smaller screens */
-            height: auto;
+            touch-action: none;
+            background: #ffffff;
         }
         
         canvas:active {
@@ -48,35 +65,46 @@
         }
 
         .instructions {
-            margin-top: 10px;
+            margin-top: 15px;
+            margin-bottom: 20px;
             font-size: 14px;
             color: #666666;
             text-align: center;
         }
 
+        #side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 320px;
+            max-width: 100%;
+        }
+
         #status-card {
-            margin-top: 20px;
             padding: 15px;
             border: 1px solid #000000;
-            width: 870px;
-            max-width: 100%; /* Adapts to smaller mobile screens */
             box-sizing: border-box;
             display: flex;
-            justify-content: space-between;
-            font-size: 15px;
-            flex-wrap: wrap; /* Wraps items if screen is too narrow */
-            gap: 15px;
+            flex-direction: column;
+            gap: 12px;
+            font-size: 14px;
+            background: #ffffff;
         }
 
         .status-group {
             display: flex;
-            flex-direction: column;
-            gap: 5px;
+            justify-content: space-between;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 5px;
+        }
+
+        .status-group:last-child {
+            border-bottom: none;
         }
 
         .status-group b {
             text-transform: uppercase;
-            font-size: 12px;
+            font-size: 11px;
             letter-spacing: 0.5px;
             color: #555555;
         }
@@ -85,139 +113,169 @@
 <body>
 
     <div id="controls">
-        <label><input type="radio" name="optics" value="concave-mirror" checked> Concave Mirror</label>
+        <label><input type="radio" name="optics" value="concave-mirror"> Concave Mirror</label>
         <label><input type="radio" name="optics" value="convex-mirror"> Convex Mirror</label>
         <label><input type="radio" name="optics" value="convex-lens"> Convex Lens</label>
         <label><input type="radio" name="optics" value="concave-lens"> Concave Lens</label>
+        <label><input type="radio" name="optics" value="prism" checked> Prism Experiment</label>
     </div>
 
-    <canvas id="opticsCanvas" width="900" height="450"></canvas>
+    <div id="workspace">
+        <canvas id="opticsCanvas" width="800" height="450"></canvas>
+        
+        <div id="side-panel">
+            <canvas id="graphCanvas" width="320" height="240" style="border: 1px solid #000000;"></canvas>
+            
+            <div id="status-card">
+                <div class="status-group" id="nature-box">
+                    <b>Nature of image</b>
+                    <span id="nature-val">Refraction</span>
+                </div>
+                <div class="status-group" id="size-box">
+                    <b>Size of image</b>
+                    <span id="size-val">Adjusted</span>
+                </div>
+            </div>
+        </div>
+    </div>
     
-    <div class="instructions">Click/Tap and drag the vertical <b>Object</b> arrow along the axis.</div>
-
-    <div id="status-card">
-        <div class="status-group">
-            <b>Type & Orientation</b>
-            <span id="nature-val">-</span>
-        </div>
-        <div class="status-group">
-            <b>Size Relative to Object</b>
-            <span id="size-val">-</span>
-        </div>
-        <div class="status-group">
-            <b>Magnification (m)</b>
-            <span id="mag-val">-</span>
-        </div>
-    </div>
+    <div class="instructions" id="instruction-text">Drag the handle along the arc to rotate the incident beam angle.</div>
 
     <script>
         const canvas = document.getElementById('opticsCanvas');
         const ctx = canvas.getContext('2d');
+        const graphCanvas = document.getElementById('graphCanvas');
+        const gCtx = graphCanvas.getContext('2d');
         const radios = document.querySelectorAll('input[name="optics"]');
         
         const natureVal = document.getElementById('nature-val');
         const sizeVal = document.getElementById('size-val');
-        const magVal = document.getElementById('mag-val');
+        const instText = document.getElementById('instruction-text');
 
-        // Constants & Setup
         const originX = canvas.width / 2;
         const originY = canvas.height / 2;
         const fLength = 120; 
         
-        // State variables
-        let currentOptics = 'concave-mirror';
+        let currentOptics = 'prism';
         let objectX = originX - 180; 
         const objectHeight = 60;     
         let isDragging = false;
 
+        // Prism Constants
+        const prismN = 1.55; 
+        const pSize = 220; 
+        const arcRadius = 180;
+        
+        // Arc bounds. 195 allows the incident ray to pass the TIR threshold before hard-stopping
+        const minHandleAngle = 125;                     
+        const maxHandleAngle = 195;  
+        let handleAngleDeg = 150; 
+
         radios.forEach(radio => {
             radio.addEventListener('change', (e) => {
                 currentOptics = e.target.value;
-                if (currentOptics.includes('mirror') && objectX >= originX) {
-                    objectX = originX - 100;
+                if (currentOptics === 'prism') {
+                    instText.innerHTML = "Drag the <b>orange dial handle circle</b> along the arc to rotate the incident beam angle smoothly.";
+                } else {
+                    instText.innerHTML = "Click/Tap and drag the vertical <b>Object</b> arrow along the axis.";
+                    if (currentOptics.includes('mirror') && objectX >= originX) {
+                        objectX = originX - 100;
+                    }
                 }
                 draw();
             });
         });
 
-        // Updated to use clientX safely relative to canvas bounding rect bounding box 
-        function getPointerX(e) {
+        function getPointerCoords(e) {
             const rect = canvas.getBoundingClientRect();
-            // Account for css scaling if the canvas is squeezed onto a small screen
-            const scaleX = canvas.width / rect.width;
-            return (e.clientX - rect.left) * scaleX;
+            return {
+                x: (e.clientX - rect.left) * (canvas.width / rect.width),
+                y: (e.clientY - rect.top) * (canvas.height / rect.height)
+            };
         }
 
-        // Switched to Pointer Events for universal desktop/mobile support
+        function getIntersection(A, B, C, D) {
+            const tTop = (D.x - C.x)*(A.y - C.y) - (D.y - C.y)*(A.x - C.x);
+            const uTop = (C.y - A.y)*(A.x - B.x) - (C.x - A.x)*(A.y - B.y);
+            const bottom = (D.y - C.y)*(B.x - A.x) - (D.x - C.x)*(B.y - A.y);
+            if (bottom !== 0) {
+                const t = tTop / bottom;
+                const u = uTop / bottom;
+                if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+                    return { x: A.x + t*(B.x - A.x), y: A.y + t*(B.y - A.y) };
+                }
+            }
+            return null;
+        }
+
         canvas.addEventListener('pointerdown', (e) => {
-            const pointerX = getPointerX(e);
-            // Increased tap target threshold slightly to 35 for fat-finger mobile friendliness
-            if (Math.abs(pointerX - objectX) < 35) {
+            const coords = getPointerCoords(e);
+            if (currentOptics === 'prism') {
                 isDragging = true;
-                canvas.setPointerCapture(e.pointerId); // Keeps tracking smooth even if finger slips off canvas
+                canvas.setPointerCapture(e.pointerId);
+            } else {
+                if (Math.abs(coords.x - objectX) < 35) {
+                    isDragging = true;
+                    canvas.setPointerCapture(e.pointerId);
+                }
             }
         });
 
-        window.addEventListener('pointerup', () => {
-            isDragging = false;
-        });
+        window.addEventListener('pointerup', () => { isDragging = false; });
 
         canvas.addEventListener('pointermove', (e) => {
             if (!isDragging) return;
+            const coords = getPointerCoords(e);
             
-            let mouseX = getPointerX(e);
-            
-            if (mouseX > originX - 10) mouseX = originX - 10;
-            
-            if (mouseX < 20) mouseX = 20;
-            if (mouseX > canvas.width - 20) mouseX = canvas.width - 20;
-            
-            if (Math.abs(mouseX - originX) < 5) {
-                mouseX = mouseX < originX ? originX - 5 : originX + 5;
-            }
+            if (currentOptics === 'prism') {
+                const topPt = { x: originX + 20, y: originY - 110 };
+                const leftPt = { x: topPt.x - pSize * Math.sin(Math.PI/6), y: topPt.y + pSize * Math.cos(Math.PI/6) };
+                const mid1 = { x: (topPt.x + leftPt.x)/2, y: (topPt.y + leftPt.y)/2 };
 
-            if (currentOptics === 'concave-mirror' && Math.abs((originX - mouseX) - fLength) < 3) {
-                mouseX = (originX - mouseX) < fLength ? originX - fLength + 3 : originX - fLength - 3;
+                let angle = Math.atan2(coords.y - mid1.y, coords.x - mid1.x) * 180 / Math.PI;
+                if (angle < 0) angle += 360; 
+                
+                handleAngleDeg = Math.max(minHandleAngle, Math.min(maxHandleAngle, angle));
+            } else {
+                let mouseX = coords.x;
+                if (mouseX > originX - 10) mouseX = originX - 10;
+                if (mouseX < 20) mouseX = 20;
+                if (Math.abs(mouseX - originX) < 5) mouseX = mouseX < originX ? originX - 5 : originX + 5;
+                if ((currentOptics === 'concave-mirror' || currentOptics === 'convex-lens') && Math.abs((originX - mouseX) - fLength) < 3) {
+                    mouseX = (originX - mouseX) < fLength ? originX - fLength + 3 : originX - fLength - 3;
+                }
+                objectX = mouseX;
             }
-            if (currentOptics === 'convex-lens' && Math.abs((originX - mouseX) - fLength) < 3) {
-                mouseX = (originX - mouseX) < fLength ? originX - fLength + 3 : originX - fLength - 3;
-            }
-
-            objectX = mouseX;
             draw();
         });
 
-        function drawArrow(x, y, height, label, isVirtual = false) {
+        function drawRayWithArrow(x1, y1, x2, y2, color = '#000000', width = 2.5) {
             ctx.save();
-            ctx.lineWidth = 2;
-            if (isVirtual) {
-                ctx.setLineDash([4, 4]);
-            }
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
             ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.lineTo(x, y - height);
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
             ctx.stroke();
 
-            // Arrowhead
-            const arrowSize = 6;
-            const direction = height > 0 ? 1 : -1;
+            const midX = (x1 + x2) / 2;
+            const midY = (y1 + y2) / 2;
+            const angle = Math.atan2(y2 - y1, x2 - x1);
+            
+            ctx.fillStyle = color;
             ctx.beginPath();
-            ctx.moveTo(x, y - height);
-            ctx.lineTo(x - arrowSize, y - height + arrowSize * direction);
-            ctx.lineTo(x + arrowSize, y - height + arrowSize * direction);
-            ctx.fillStyle = '#000000';
+            ctx.moveTo(midX, midY);
+            ctx.lineTo(midX - 8 * Math.cos(angle - Math.PI/6), midY - 8 * Math.sin(angle - Math.PI/6));
+            ctx.lineTo(midX - 8 * Math.cos(angle + Math.PI/6), midY - 8 * Math.sin(angle + Math.PI/6));
             ctx.fill();
-
-            // Label
-            ctx.font = '14px sans-serif';
-            ctx.fillStyle = '#000000';
-            ctx.fillText(label, x - 18, y - height - (10 * direction));
             ctx.restore();
         }
 
-        function drawDashedLine(x1, y1, x2, y2) {
+        function drawDashedLine(x1, y1, x2, y2, color = '#000000') {
             ctx.save();
+            ctx.strokeStyle = color;
             ctx.setLineDash([4, 4]);
+            ctx.lineWidth = 1;
             ctx.beginPath();
             ctx.moveTo(x1, y1);
             ctx.lineTo(x2, y2);
@@ -225,244 +283,276 @@
             ctx.restore();
         }
 
-        function drawMirrorHatching(cx, cy, radius, startAngle, endAngle, facingLeft) {
-            ctx.save();
-            ctx.lineWidth = 1;
-            const steps = 25;
-            const angleDelta = (endAngle - startAngle) / steps;
-            const hatchLength = 8;
+        function calcTheoreticalDeviation(i1_deg) {
+            const A = 60 * Math.PI / 180;
+            const rad1 = i1_deg * Math.PI / 180;
+            const r1 = Math.asin(Math.sin(rad1) / prismN);
+            const r2 = A - r1;
+            const sin_i2 = prismN * Math.sin(r2);
+            if (Math.abs(sin_i2) > 1) return null; 
+            const i2 = Math.asin(sin_i2);
+            return (rad1 + i2 - A) * 180 / Math.PI;
+        }
 
-            for(let i = 0; i <= steps; i++) {
-                let angle = startAngle + (i * angleDelta);
-                let x = cx + radius * Math.cos(angle);
-                let y = cy + radius * Math.sin(angle);
-                
-                ctx.beginPath();
-                ctx.moveTo(x, y);
-                let factor = facingLeft ? 1 : -1;
-                ctx.lineTo(x + Math.cos(angle + 0.5) * hatchLength * factor, y + Math.sin(angle + 0.5) * hatchLength * factor);
-                ctx.stroke();
+        function drawPrismGraph(activeI1) {
+            gCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+            
+            gCtx.strokeStyle = '#888888';
+            gCtx.lineWidth = 1;
+            gCtx.beginPath();
+            gCtx.moveTo(40, 20); gCtx.lineTo(40, 200); gCtx.lineTo(300, 200);
+            gCtx.stroke();
+            
+            gCtx.fillStyle = '#000000';
+			gCtx.font = "11px Georgia, 'Times New Roman', serif";
+            gCtx.fillText("Incident Angle (i₁) →", 110, 225);
+            gCtx.save();
+            gCtx.translate(15, 130);
+            gCtx.rotate(-Math.PI / 2);
+            gCtx.fillText("Deviation (δ) →", 0, 0);
+            gCtx.restore();
+
+            gCtx.strokeStyle = '#000000';
+            gCtx.lineWidth = 2;
+            gCtx.beginPath();
+            let first = true;
+
+            for (let deg = 20; deg <= 90; deg += 1) {
+                let dev = calcTheoreticalDeviation(deg);
+                if (dev !== null) {
+                    let gx = 40 + ((deg - 20) / 70) * 240;
+                    let gy = 200 - ((dev - 30) / 45) * 160;
+                    if (first) { gCtx.moveTo(gx, gy); first = false; } 
+                    else { gCtx.lineTo(gx, gy); }
+                }
             }
+            gCtx.stroke();
+
+            if (activeI1 !== null) {
+                let dev = calcTheoreticalDeviation(activeI1);
+                if (dev !== null) {
+                    let curGx = 40 + ((activeI1 - 20) / 70) * 240;
+                    let curGy = 200 - ((dev - 30) / 45) * 160;
+                    gCtx.fillStyle = '#ff3b30';
+                    gCtx.beginPath();
+                    gCtx.arc(curGx, curGy, 5, 0, 2 * Math.PI);
+                    gCtx.fill();
+                }
+            }
+        }
+
+        function drawArrow(x, y, height, label, isVirtual = false) {
+            ctx.save(); ctx.lineWidth = 2.5; if (isVirtual) ctx.setLineDash([4, 4]);
+            ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y - height); ctx.stroke();
+            const arrowSize = 6; const dir = height > 0 ? 1 : -1;
+            ctx.beginPath(); ctx.moveTo(x, y - height); ctx.lineTo(x - arrowSize, y - height + arrowSize * dir); ctx.lineTo(x + arrowSize, y - height + arrowSize * dir);
+            ctx.fillStyle = '#000000'; ctx.fill();
+            ctx.font = '13px sans-serif'; ctx.fillStyle = '#000000'; ctx.fillText(label, x - 18, y - height - (10 * dir));
             ctx.restore();
+        }
+
+        function drawMirrorHatching(cx, cy, radius, startAngle, endAngle, facingLeft) { 
+            ctx.save(); ctx.lineWidth = 1; const steps = 25; const angleDelta = (endAngle - startAngle) / steps; 
+            for(let i = 0; i <= steps; i++) { 
+                let angle = startAngle + (i * angleDelta); let x = cx + radius * Math.cos(angle); let y = cy + radius * Math.sin(angle); 
+                ctx.beginPath(); ctx.moveTo(x, y); let factor = facingLeft ? 1 : -1; ctx.lineTo(x + Math.cos(angle + 0.5) * 8 * factor, y + Math.sin(angle + 0.5) * 8 * factor); ctx.stroke(); 
+            } 
+            ctx.restore(); 
         }
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.lineWidth = 1.5;
-            ctx.strokeStyle = '#000000';
+            
+            if (currentOptics === 'prism') {
+                const topPt = { x: originX + 20, y: originY - 110 };
+                const leftPt = { x: topPt.x - pSize * Math.sin(Math.PI/6), y: topPt.y + pSize * Math.cos(Math.PI/6) };
+                const rightPt = { x: topPt.x + pSize * Math.sin(Math.PI/6), y: topPt.y + pSize * Math.cos(Math.PI/6) };
+                
+                ctx.lineWidth = 2.5; ctx.strokeStyle = '#000000';
+                ctx.beginPath(); ctx.moveTo(topPt.x, topPt.y); ctx.lineTo(leftPt.x, leftPt.y); ctx.lineTo(rightPt.x, rightPt.y); ctx.closePath(); ctx.stroke();
 
-            // 1. Principal Axis
-            ctx.beginPath();
-            ctx.moveTo(0, originY);
-            ctx.lineTo(canvas.width, originY);
-            ctx.stroke();
+                const mid1 = { x: (topPt.x + leftPt.x)/2, y: (topPt.y + leftPt.y)/2 };
+                
+                const n1_out_deg = -150;
+                const n1_in_rad = (n1_out_deg + 180) * Math.PI / 180; 
 
-            ctx.font = '14px sans-serif';
-            ctx.fillStyle = '#000000';
-            ctx.fillText('P', originX - 15, originY + 20);
+                ctx.save();
+                ctx.strokeStyle = '#dddddd'; ctx.lineWidth = 2; ctx.setLineDash([4, 4]);
+                ctx.beginPath(); ctx.arc(mid1.x, mid1.y, arcRadius, minHandleAngle * Math.PI/180, maxHandleAngle * Math.PI/180); ctx.stroke();
+                ctx.restore();
 
-            let fLeftX = originX - fLength;
-            let fRightX = originX + fLength;
-            let cLeftX = originX - (2 * fLength);
+                const hx = mid1.x + arcRadius * Math.cos(handleAngleDeg * Math.PI/180);
+                const hy = mid1.y + arcRadius * Math.sin(handleAngleDeg * Math.PI/180);
+                
+                ctx.fillStyle = '#ff9500'; ctx.strokeStyle = '#000000'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(hx, hy, 8, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
 
-            ctx.beginPath();
-            ctx.arc(fLeftX, originY, 3, 0, 2 * Math.PI);
-            ctx.arc(fRightX, originY, 3, 0, 2 * Math.PI);
-            ctx.fill();
-            ctx.fillText('F', fLeftX - 4, originY + 20);
-            ctx.fillText('F', fRightX - 4, originY + 20);
+                drawRayWithArrow(hx, hy, mid1.x, mid1.y, '#ff9500');
+
+                let ray_in_rad = Math.atan2(mid1.y - hy, mid1.x - hx);
+                let angle_of_incidence = ray_in_rad - n1_in_rad; 
+                let i1_val = Math.abs(angle_of_incidence * 180 / Math.PI);
+                
+                let r_internal_rad = Math.asin(Math.sin(angle_of_incidence) / prismN);
+                let ray_internal_dir = n1_in_rad + r_internal_rad;
+
+                let ray2_target = { x: mid1.x + 1000 * Math.cos(ray_internal_dir), y: mid1.y + 1000 * Math.sin(ray_internal_dir) };
+                
+                let hitRight = getIntersection(mid1, ray2_target, topPt, rightPt);
+                let hitBase = getIntersection(mid1, ray2_target, leftPt, rightPt);
+                
+                let exitPt = null;
+                let n2_out_deg = 0;
+                
+                if (hitRight) { 
+                    exitPt = hitRight; 
+                    n2_out_deg = -30; 
+                } else if (hitBase) { 
+                    exitPt = hitBase; 
+                    n2_out_deg = 90; 
+                }
+
+                if (exitPt) {
+                    drawRayWithArrow(mid1.x, mid1.y, exitPt.x, exitPt.y, '#ff9500');
+                    
+                    let n2_out_rad = n2_out_deg * Math.PI / 180;
+                    let angle_approaching_boundary = ray_internal_dir - n2_out_rad;
+                    let sin_out = prismN * Math.sin(angle_approaching_boundary);
+
+                    let isTIR = Math.abs(sin_out) > 1;
+
+                    // ALWAYS draw forward extended incident line
+                    drawDashedLine(mid1.x, mid1.y, mid1.x + 350 * Math.cos(ray_in_rad), mid1.y + 350 * Math.sin(ray_in_rad), '#aaaaaa');
+
+                    if (isTIR) {
+                        // Total Internal Reflection visual
+                        let ray_reflect_dir = 2 * n2_out_rad - ray_internal_dir + Math.PI;
+                        let ray3_end = { x: exitPt.x + 150 * Math.cos(ray_reflect_dir), y: exitPt.y + 150 * Math.sin(ray_reflect_dir) };
+                        drawRayWithArrow(exitPt.x, exitPt.y, ray3_end.x, ray3_end.y, '#ff3b30');
+
+                        natureVal.textContent = "Total Internal Reflection";
+                        sizeVal.textContent = "-";
+                        
+                    } else {
+                        // Standard Refraction
+                        let r_emergent_rad = Math.asin(sin_out);
+                        let ray_emergent_dir = n2_out_rad + r_emergent_rad;
+                        
+                        let ray3_end = { x: exitPt.x + 200 * Math.cos(ray_emergent_dir), y: exitPt.y + 200 * Math.sin(ray_emergent_dir) };
+                        drawRayWithArrow(exitPt.x, exitPt.y, ray3_end.x, ray3_end.y, '#ff9500');
+
+                        // Extend emergent ray backwards
+                        drawDashedLine(exitPt.x, exitPt.y, exitPt.x - 250 * Math.cos(ray_emergent_dir), exitPt.y - 250 * Math.sin(ray_emergent_dir), '#aaaaaa');
+
+                        // Intersection Calculation for Delta (Deviation angle)
+                        let det = Math.cos(ray_in_rad) * Math.sin(ray_emergent_dir) - Math.sin(ray_in_rad) * Math.cos(ray_emergent_dir);
+                        if (Math.abs(det) > 0.001) {
+                            let t = ((exitPt.x - mid1.x) * Math.sin(ray_emergent_dir) - (exitPt.y - mid1.y) * Math.cos(ray_emergent_dir)) / det;
+                            let intersectP = { x: mid1.x + t * Math.cos(ray_in_rad), y: mid1.y + t * Math.sin(ray_in_rad) };
+                            
+                            // Draw the deviation arc
+                            ctx.save();
+                            ctx.beginPath();
+                            ctx.strokeStyle = '#000000';
+                            ctx.lineWidth = 1.5;
+                            ctx.arc(intersectP.x, intersectP.y, 25, ray_in_rad, ray_emergent_dir, false);
+                            ctx.stroke();
+                            
+                            // Delta Annotation Label
+                            let midAngle = (ray_in_rad + ray_emergent_dir) / 2;
+                            ctx.fillStyle = '#0055ff';
+                            ctx.font = "15px Georgia, 'Times New Roman', serif"; 
+                            ctx.fillText('δ', intersectP.x + 35 * Math.cos(midAngle) - 5, intersectP.y + 35 * Math.sin(midAngle) + 5);
+                            ctx.restore();
+                        }
+
+                        natureVal.textContent = "Dispersion / Refraction";
+                        sizeVal.textContent = "-";
+                    }
+
+                    // Ghost Normals for visual reference
+                    drawDashedLine(mid1.x - 40*Math.cos(n1_in_rad), mid1.y - 40*Math.sin(n1_in_rad), mid1.x + 40*Math.cos(n1_in_rad), mid1.y + 40*Math.sin(n1_in_rad));
+                    drawDashedLine(exitPt.x - 40*Math.cos(n2_out_rad), exitPt.y - 40*Math.sin(n2_out_rad), exitPt.x + 40*Math.cos(n2_out_rad), exitPt.y + 40*Math.sin(n2_out_rad));
+
+                    drawPrismGraph(i1_val);
+                }
+                return;
+            }
+
+            ctx.lineWidth = 1.5; ctx.strokeStyle = '#000000';
+            ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(canvas.width, originY); ctx.stroke();
+            ctx.font = '14px sans-serif'; ctx.fillStyle = '#000000'; ctx.fillText('P', originX - 15, originY + 20);
+
+            let fLeftX = originX - fLength; let fRightX = originX + fLength; let cLeftX = originX - (2 * fLength);
+            ctx.beginPath(); ctx.arc(fLeftX, originY, 3, 0, 2 * Math.PI); ctx.arc(fRightX, originY, 3, 0, 2 * Math.PI); ctx.fill();
+            ctx.fillText('F', fLeftX - 4, originY + 20); ctx.fillText('F', fRightX - 4, originY + 20);
 
             if (currentOptics.includes('mirror')) {
-                ctx.beginPath();
-                ctx.arc(cLeftX, originY, 3, 0, 2 * Math.PI);
-                ctx.fill();
-                ctx.fillText('C', cLeftX - 4, originY + 20);
+                ctx.beginPath(); ctx.arc(cLeftX, originY, 3, 0, 2 * Math.PI); ctx.fill(); ctx.fillText('C', cLeftX - 4, originY + 20);
             }
 
-            // 2. Render Optical Element
             ctx.beginPath();
             if (currentOptics === 'concave-mirror') {
-                ctx.arc(originX - 400, originY, 400, -0.3, 0.3);
-                ctx.stroke();
-                drawMirrorHatching(originX - 400, originY, 400, -0.3, 0.3, true);
+                ctx.arc(originX - 400, originY, 400, -0.3, 0.3); ctx.stroke(); drawMirrorHatching(originX - 400, originY, 400, -0.3, 0.3, true);
             } else if (currentOptics === 'convex-mirror') {
-                ctx.arc(originX + 400, originY, 400, Math.PI - 0.3, Math.PI + 0.3);
-                ctx.stroke();
-                drawMirrorHatching(originX + 400, originY, 400, Math.PI - 0.3, Math.PI + 0.3, false);
+                ctx.arc(originX + 400, originY, 400, Math.PI - 0.3, Math.PI + 0.3); ctx.stroke(); drawMirrorHatching(originX + 400, originY, 400, Math.PI - 0.3, Math.PI + 0.3, false);
             } else if (currentOptics === 'convex-lens') {
-                ctx.arc(originX - 382, originY, 400, -0.3, 0.3);
-                ctx.arc(originX + 382, originY, 400, Math.PI - 0.3, Math.PI + 0.3);
-                ctx.stroke();
+                ctx.arc(originX - 382, originY, 400, -0.3, 0.3); ctx.arc(originX + 382, originY, 400, Math.PI - 0.3, Math.PI + 0.3); ctx.stroke();
             } else if (currentOptics === 'concave-lens') {
-                ctx.moveTo(originX - 15, originY - 120);
-                ctx.lineTo(originX + 15, originY - 120);
-                ctx.quadraticCurveTo(originX, originY, originX + 15, originY + 120);
-                ctx.lineTo(originX - 15, originY + 120);
-                ctx.quadraticCurveTo(originX, originY, originX - 15, originY - 120);
-                ctx.stroke();
+                ctx.moveTo(originX - 15, originY - 120); ctx.lineTo(originX + 15, originY - 120);
+                ctx.quadraticCurveTo(originX, originY, originX + 15, originY + 120); ctx.lineTo(originX - 15, originY + 120); ctx.quadraticCurveTo(originX, originY, originX - 15, originY - 120); ctx.stroke();
             }
 
-            // 3. Draw Object
-            const objH = objectHeight;
-            const objX = objectX;
+            const objH = objectHeight; const objX = objectX;
             drawArrow(objX, originY, objH, 'Object');
 
-            // 4. Physics Computation
-            const u = objX - originX; 
-            let v = 0;               
-            let imgH = 0;            
-            let f = fLength;
-            let m = 0;
+            const u = objX - originX; let v = 0; let imgH = 0; let f = fLength; let m = 0;
 
             if (currentOptics === 'concave-mirror') {
-                f = -fLength; 
-                v = 1 / ((1 / f) - (1 / u));
-                m = - (v / u);
-                imgH = m * objH;
-                const imgX = originX + v;
-
-                ctx.beginPath();
-                ctx.moveTo(objX, originY - objH);
-                ctx.lineTo(originX, originY - objH);
-                ctx.stroke();
-
+                f = -fLength; v = 1 / ((1 / f) - (1 / u)); m = - (v / u); imgH = m * objH; const imgX = originX + v;
+                drawRayWithArrow(objX, originY - objH, originX, originY - objH);
                 if (v < 0) { 
-                    ctx.beginPath();
-                    ctx.moveTo(originX, originY - objH);
-                    ctx.lineTo(imgX, originY - imgH);
-                    ctx.stroke();
-
-                    ctx.beginPath();
-                    ctx.moveTo(objX, originY - objH);
-                    ctx.lineTo(originX, originY);
-                    ctx.lineTo(imgX, originY - imgH);
-                    ctx.stroke();
+                    drawRayWithArrow(originX, originY - objH, imgX, originY - imgH); drawRayWithArrow(objX, originY - objH, originX, originY); drawRayWithArrow(originX, originY, imgX, originY - imgH);
                 } else { 
                     let slope1 = ((originY - imgH) - (originY - objH)) / (imgX - originX);
-                    ctx.beginPath();
-                    ctx.moveTo(originX, originY - objH);
-                    ctx.lineTo(0, (originY - objH) - slope1 * originX);
-                    ctx.stroke();
-                    drawDashedLine(originX, originY - objH, imgX, originY - imgH);
-
+                    drawRayWithArrow(originX, originY - objH, 0, (originY - objH) - slope1 * originX); drawDashedLine(originX, originY - objH, imgX, originY - imgH);
                     let slope2 = ((originY - imgH) - originY) / (imgX - originX);
-                    ctx.beginPath();
-                    ctx.moveTo(objX, originY - objH);
-                    ctx.lineTo(originX, originY);
-                    ctx.lineTo(0, originY - slope2 * originX);
-                    ctx.stroke();
-                    drawDashedLine(originX, originY, imgX, originY - imgH);
+                    drawRayWithArrow(objX, originY - objH, originX, originY); drawRayWithArrow(originX, originY, 0, originY - slope2 * originX); drawDashedLine(originX, originY, imgX, originY - imgH);
                 }
                 drawArrow(imgX, originY, imgH, 'Image', v > 0);
 
             } else if (currentOptics === 'convex-mirror') {
-                f = fLength; 
-                v = 1 / ((1 / f) - (1 / u));
-                m = - (v / u);
-                imgH = m * objH;
-                const imgX = originX + v;
-
-                ctx.beginPath();
-                ctx.moveTo(objX, originY - objH);
-                ctx.lineTo(originX, originY - objH);
-                ctx.stroke();
-
-                let slope1 = ((originY - objH) - originY) / (originX - fRightX);
-                ctx.beginPath();
-                ctx.moveTo(originX, originY - objH);
-                ctx.lineTo(0, (originY - objH) - slope1 * originX);
-                ctx.stroke();
-                drawDashedLine(originX, originY - objH, imgX, originY - imgH);
-
-                let slope2 = ((originY - imgH) - originY) / (imgX - originX);
-                ctx.beginPath();
-                ctx.moveTo(objX, originY - objH);
-                ctx.lineTo(originX, originY);
-                ctx.lineTo(0, originY - slope2 * originX);
-                ctx.stroke();
-                drawDashedLine(originX, originY, imgX, originY - imgH);
-
+                f = fLength; v = 1 / ((1 / f) - (1 / u)); m = - (v / u); imgH = m * objH; const imgX = originX + v;
+                drawRayWithArrow(objX, originY - objH, originX, originY - objH);
+                let slope1 = ((originY - objH) - originY) / (originX - fRightX); drawRayWithArrow(originX, originY - objH, 0, (originY - objH) - slope1 * originX); drawDashedLine(originX, originY - objH, imgX, originY - imgH);
+                let slope2 = ((originY - imgH) - originY) / (imgX - originX); drawRayWithArrow(objX, originY - objH, originX, originY); drawRayWithArrow(originX, originY, 0, originY - slope2 * originX); drawDashedLine(originX, originY, imgX, originY - imgH);
                 drawArrow(imgX, originY, imgH, 'Image', true);
 
             } else if (currentOptics === 'convex-lens') {
-                f = fLength; 
-                v = 1 / ((1 / f) + (1 / u));
-                m = (v / u);
-                imgH = m * objH;
-                const imgX = originX + v;
-
-                ctx.beginPath();
-                ctx.moveTo(objX, originY - objH);
-                ctx.lineTo(originX, originY - objH);
-                ctx.stroke();
-
+                f = fLength; v = 1 / ((1 / f) + (1 / u)); m = (v / u); imgH = m * objH; const imgX = originX + v;
+                drawRayWithArrow(objX, originY - objH, originX, originY - objH);
                 if (v > 0) { 
-                    ctx.beginPath();
-                    ctx.moveTo(originX, originY - objH);
-                    ctx.lineTo(imgX, originY - imgH);
-                    ctx.stroke();
-
-                    ctx.beginPath();
-                    ctx.moveTo(objX, originY - objH);
-                    ctx.lineTo(imgX, originY - imgH);
-                    ctx.stroke();
+                    drawRayWithArrow(originX, originY - objH, imgX, originY - imgH); drawRayWithArrow(objX, originY - objH, imgX, originY - imgH);
                 } else { 
-                    let slope1 = ((originY - imgH) - (originY - objH)) / (imgX - originX);
-                    ctx.beginPath();
-                    ctx.moveTo(originX, originY - objH);
-                    ctx.lineTo(canvas.width, (originY - objH) + slope1 * (canvas.width - originX));
-                    ctx.stroke();
-                    drawDashedLine(originX, originY - objH, imgX, originY - imgH);
-
-                    let slope2 = ((originY - imgH) - originY) / (imgX - originX);
-                    ctx.beginPath();
-                    ctx.moveTo(objX, originY - objH);
-                    ctx.lineTo(originX, originY);
-                    ctx.lineTo(canvas.width, originY + slope2 * (canvas.width - originX));
-                    ctx.stroke();
-                    drawDashedLine(originX, originY, imgX, originY - imgH);
+                    let slope1 = ((originY - imgH) - (originY - objH)) / (imgX - originX); drawRayWithArrow(originX, originY - objH, canvas.width, (originY - objH) + slope1 * (canvas.width - originX)); drawDashedLine(originX, originY - objH, imgX, originY - imgH);
+                    let slope2 = ((originY - imgH) - originY) / (imgX - originX); drawRayWithArrow(objX, originY - objH, originX, originY); drawRayWithArrow(originX, originY, canvas.width, originY + slope2 * (canvas.width - originX)); drawDashedLine(originX, originY, imgX, originY - imgH);
                 }
                 drawArrow(imgX, originY, imgH, 'Image', v < 0);
 
             } else if (currentOptics === 'concave-lens') {
-                f = -fLength;
-                v = 1 / ((1 / f) + (1 / u));
-                m = (v / u);
-                imgH = m * objH;
-                const imgX = originX + v;
-
-                ctx.beginPath();
-                ctx.moveTo(objX, originY - objH);
-                ctx.lineTo(originX, originY - objH);
-                ctx.stroke();
-
-                let slope1 = ((originY - imgH) - (originY - objH)) / (imgX - originX);
-                ctx.beginPath();
-                ctx.moveTo(originX, originY - objH);
-                ctx.lineTo(canvas.width, (originY - objH) + slope1 * (canvas.width - originX));
-                ctx.stroke();
-                drawDashedLine(originX, originY - objH, imgX, originY - imgH);
-
-                let slope2 = ((originY - imgH) - originY) / (imgX - originX);
-                ctx.beginPath();
-                ctx.moveTo(objX, originY - objH);
-                ctx.lineTo(originX, originY);
-                ctx.lineTo(canvas.width, originY + slope2 * (canvas.width - originX));
-                ctx.stroke();
-                drawDashedLine(originX, originY, imgX, originY - imgH);
-
+                f = -fLength; v = 1 / ((1 / f) + (1 / u)); m = (v / u); imgH = m * objH; const imgX = originX + v;
+                drawRayWithArrow(objX, originY - objH, originX, originY - objH);
+                let slope1 = ((originY - imgH) - (originY - objH)) / (imgX - originX); drawRayWithArrow(originX, originY - objH, canvas.width, (originY - objH) + slope1 * (canvas.width - originX)); drawDashedLine(originX, originY - objH, imgX, originY - imgH);
+                let slope2 = ((originY - imgH) - originY) / (imgX - originX); drawRayWithArrow(objX, originY - objH, originX, originY); drawRayWithArrow(originX, originY, canvas.width, originY + slope2 * (canvas.width - originX)); drawDashedLine(originX, originY, imgX, originY - imgH);
                 drawArrow(imgX, originY, imgH, 'Image', true);
             }
 
-            // 5. Update UI Metrics Panel
-            let natureStr = m < 0 ? "Real & Inverted" : "Virtual & Erect";
-            let sizeStr = Math.abs(m) > 1.05 ? "Enlarged" : Math.abs(m) < 0.95 ? "Diminished" : "Same Size";
-            
-            natureVal.textContent = natureStr;
-            sizeVal.textContent = sizeStr;
-            magVal.textContent = `${m > 0 ? '+' : ''}${m.toFixed(2)}`;
-        }
+            natureVal.textContent = m < 0 ? "Real & Inverted" : "Virtual & Erect";
+            sizeVal.textContent = Math.abs(m) > 1.05 ? "Enlarged" : Math.abs(m) < 0.95 ? "Diminished" : "Same Size";
 
+            gCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+            gCtx.fillStyle = '#888888'; gCtx.font = '13px sans-serif'; gCtx.fillText("Graph active in Prism mode.", 55, 120);
+        }
         draw();
     </script>
 </body>
